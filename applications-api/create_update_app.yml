@@ -8,16 +8,16 @@
   tasks:
     - name: check if applications-api state file {{ dt_environment_id }}-{{ app_name }}-id.yml exists
       stat:
-        path: "./state/{{ dt_environment_id }}-{{ app_name }}-app-id.yml"
+        path: "./state/{{ dt_environment_id }}-{{ app_name }}-id.yml"
       register: appapistatefile
 
     - name: load vars from applications-api state file {{ dt_environment_id }}-{{ app_name }}-id.yml
-      include_vars: "../applications-api/state/{{ dt_environment_id }}-{{ app_name }}-id.yml"
+      include_vars: "./state/{{ dt_environment_id }}-{{ app_name }}-id.yml"
       when: appapistatefile.stat.exists
 
     - name: Update application {{ app_name }}
       uri: 
-        url: "{{ dt_environment_url }}{{ application_api }}/{{ existing_dt_app_id }}"
+        url: "{{ dt_environment_url }}{{ application_api }}/{{ dt_app_id }}"
         method: PUT
         headers:
           Content-Type: "application/json"
@@ -43,7 +43,7 @@
       register: newappresponse
       when: dt_app_id is not defined
 
-    - name: set app id if it exists for {{ app_name }}
+    - name: set app id for {{ app_name }}
       set_fact:
         dt_app_id: "{{ newappresponse.json.id }}"
       when: newappresponse.json.id is defined

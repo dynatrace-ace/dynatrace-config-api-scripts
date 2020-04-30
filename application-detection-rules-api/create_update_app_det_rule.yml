@@ -46,15 +46,10 @@
       register: newappdetruleresponse
       when: dt_app_id is defined and dt_app_det_rule_id is not defined
 
-    - name: set app det rule id if it exists for {{ app_name }}
+    - name: set app det rule id for {{ app_name }}
       set_fact:
         dt_app_det_rule_id: "{{ newappdetruleresponse.json.id }}"
       when: newappdetruleresponse.json.id is defined
-
-    - name: set app det rule id it exists for {{ app_name }}
-      set_fact:
-        dt_app_det_rule_id: "{{ updateappdetruleresponse.json.id }}"
-      when: updateappdetruleresponse.json.id is defined
 
     - name: Store the app detection rule id 
       copy:
