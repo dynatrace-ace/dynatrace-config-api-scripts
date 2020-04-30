@@ -1,0 +1,13 @@
+---
+url_pattern: http://192.168.22.12
+app_match_type: CONTAINS
+app_match_target: URL
+
+# ----- Application detection rule config API --------
+app_detection_rule_api: /api/config/v1/applicationDetectionRules
+app_detection_rule_request:
+  applicationIdentifier: "{{ dt_app_id }}"
+  filterConfig:
+    pattern: "{{ url_pattern }}"
+    applicationMatchType: "{{ app_match_type }}"
+    applicationMatchTarget: "{{ app_match_target }}"

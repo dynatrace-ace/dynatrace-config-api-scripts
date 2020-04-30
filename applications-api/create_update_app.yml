@@ -1,0 +1,72 @@
+---
+- name: Automated app and detection rules creation via dynatrace config api
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - variables.yml
+
+  tasks:
+    - name: Get list of existing apps
+      uri: 
+        url: "{{ dt_environment_url }}{{ application_api }}"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Api-Token {{ dt_api_token }}"
+        status_code: 200
+        timeout: 30
+        validate_certs: false
+      register: listappresponse
+
+    - name: set app id if exists for {{ app_name }}
+      set_fact:
+        existing_dt_app_id: "{{ item }}"
+      loop: "{{ listappresponse.json | json_query(app_list_query) }}"
+      vars:
+        app_list_query: "values[?name=='{{ app_name }}'].id"
+      when: item != ""
+
+    - name: Update application {{ app_name }}
+      uri: 
+        url: "{{ dt_environment_url }}{{ application_api }}/{{ existing_dt_app_id }}"
+        method: PUT
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Api-Token {{ dt_api_token }}"
+        body: "{{ application_request | to_json}}"
+        status_code: 200, 201, 204
+        timeout: 30
+        validate_certs: false
+      register: updateappresponse
+      when: existing_dt_app_id is defined
+
+    - name: Create application {{ app_name }}
+      uri: 
+        url: "{{ dt_environment_url }}{{ application_api }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Api-Token {{ dt_api_token }}"
+        body: "{{ application_request | to_json}}"
+        status_code: 200, 201
+        timeout: 30
+        validate_certs: false
+      register: newappresponse
+      when: existing_dt_app_id is not defined
+
+    - name: set app id if for {{ app_name }}
+      set_fact:
+        dt_app_id: "{{ newappresponse.json.id }}"
+      when: newappresponse.json.id is defined
+
+    - name: set app id if for {{ app_name }}
+      set_fact:
+        dt_app_id: "{{ existing_dt_app_id }}"
+      when: existing_dt_app_id is defined
+
+    - name: print app url
+      debug:
+        msg: "{{ dt_environment_url }}/#uemapplications/uemappmetrics;uemapplicationId={{ dt_app_id }}"
+
+- name: Include a play after another play
+  import_playbook: ../application-detection-rules-api/create_update_app_det_rule.yml
