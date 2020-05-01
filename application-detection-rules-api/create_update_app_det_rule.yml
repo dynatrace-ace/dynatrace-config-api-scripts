@@ -14,7 +14,7 @@
     - name: load vars from applications-api state file {{ dt_environment_id }}-{{ app_name }}-id.yml
       include_vars: "../applications-api/state/{{ dt_environment_id }}-{{ app_name }}-id.yml"
     
-    - name: load vars from application-detection-rules-api state file {{ app_name }}-app-rule-id.yml
+    - name: load vars from application-detection-rules-api state file {{ dt_environment_id }}-{{ app_name }}-app-rule-id.yml
       include_vars: "./state/{{ dt_environment_id }}-{{ app_name }}-app-rule-id.yml"
       when: appdetruleapistatefile.stat.exists
 
