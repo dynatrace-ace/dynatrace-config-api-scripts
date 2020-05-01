@@ -57,5 +57,5 @@
       debug:
         msg: "{{ dt_environment_url }}/#uemapplications/uemappmetrics;uemapplicationId={{ dt_app_id }}"
 
-- name: Include a play after another play
+- name: Execute playbook to create app detection rule
   import_playbook: ../application-detection-rules-api/create_update_app_det_rule.yml
