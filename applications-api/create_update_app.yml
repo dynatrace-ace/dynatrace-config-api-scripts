@@ -48,11 +48,6 @@
         dt_app_id: "{{ newappresponse.json.id }}"
       when: newappresponse.json.id is defined
 
-    - name: set app id if it exists for {{ app_name }}
-      set_fact:
-        dt_app_id: "{{ existing_dt_app_id }}"
-      when: existing_dt_app_id is defined
-
     - name: Store the app id to be used by the app detection rule
       copy:
         content: "dt_app_id: {{ dt_app_id | quote }}"
